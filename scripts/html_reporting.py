@@ -17,7 +17,7 @@ def html_report_parsed(dict_log,report_path,log_filename,time_zone_opt,rtype="Ge
 	if time_zone_opt == "DVR-Selected Time Zone":
 		time_zone = "Time (DVR-Selected Time Zone)"
 	else:
-		time_zone = "Time (UTC+00:00)"
+		time_zone = "Time (DVR-Selected Time Zone)"
 	try:
 		#Here the HTML report is being created
 		with open(f'{report_dir}\\Report_{prefix}_{filename}.html',"w", encoding="utf-8") as html_file:
@@ -111,7 +111,7 @@ def html_report_carved(img_filename,report_path,carved_results,splitn=2000,rtype
 	report_dir = f'{report_path}\\Reports_{cur_time}\\HTML\\Report_files'
 	if not os.path.exists(report_dir):
 		os.makedirs(report_dir)
-	time_zone = "Time (UTC+00:00)"
+	time_zone = "Time (DVR-Selected Time Zone)"
 	try:
 		counter = 0
 		key_holder = 0
@@ -224,7 +224,7 @@ def html_report_carved_fsinfo(img_filename,report_path,carved_results):
 			html_output += f'<td>{str(carved_results[-1])}</td>'
 			html_output += '</tr>'
 			html_output += '<tr>'
-			html_output += f'<td>Filesystem Initialization Time (UTC):</td>'
+			html_output += f'<td>Filesystem Initialization Time (DVR-Selected Time Zone):</td>'
 			html_output += f'<td>{str(carved_results[-2])}</td>'
 			html_output += '</tr>'			
 			html_output += '<tr>'

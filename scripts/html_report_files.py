@@ -1179,7 +1179,7 @@ about = """
     <link rel="icon" href="icons/myfavicon.ico">
 </head>
 <h1>About</h1>
-<p>This tool is the result of a combined research effort towards interpreting proprietary file systems. The research is published here:&nbsp;<a href="paper-link"  rel="noopener">PAPER-LINK</a></p>
+<p>This tool is the result of a combined research effort towards interpreting proprietary file systems. The research is published here:&nbsp;<a href="https://doi.org/10.1111/1556-4029.15349"  rel="noopener">IoT forensics: Exploiting unexplored log records from the HIKVISION file system</a></p>
 <nav><a href="../index.html">Home Page</a>
 </nav>
 <h3>Research Team:</h3>

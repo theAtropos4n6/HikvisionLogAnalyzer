@@ -14,7 +14,7 @@ import scripts.intel_methods as im
 cur_time = time.time()
 cur_time_in_ms = int(cur_time*1000)
 validation_status = []
-version = "1.0.0" #=> parser_last_update = "2023-01-31 17:00:00 UTC+00:00"
+version = "1.0.1" #=> parser_last_update = "2023-01-31 17:00:00 UTC+00:00"
 
 #######################################################################################################
 #                                """atropos icon BEGIN"""
@@ -353,9 +353,6 @@ while True:
 			window['-PROGRESS-BAR-'].UpdateBar(100,100)
 			prinfo = f"""Process Complete"""
 			sg.popup(prinfo, title='Hikvision Log Analyzer',button_type=0,keep_on_top=True,icon=myfavicon)
-			break
-		else:
-			window['-PROGRESS-BAR-'].update(100)
 			break
 
 window.close()

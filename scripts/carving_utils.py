@@ -112,7 +112,7 @@ def parse_fs_info(blck):
 
 	size_of_system_logs_in_hex = bytearray.fromhex(blck[208:224])
 	size_of_system_logs_le = int.from_bytes(size_of_system_logs_in_hex,"little")
-	size_of_system_logs_in_b = size_of_system_logs_le/1024
+	size_of_system_logs_in_b = size_of_system_logs_le #already in bytes
 
 	init_time = convert_date(blck[480:488])
 
@@ -440,7 +440,7 @@ def get_Description(major_type,minor_type,description):
 def convert_date(hex_date): #date is stored in hex is stored in utc but when exporting logs they are exported in configured time zone
 	log_date_hex = bytearray.fromhex(hex_date)
 	log_date_le = int.from_bytes(log_date_hex,"little")
-	log_date = datetime.datetime.fromtimestamp(log_date_le,tz=timezone.utc) #If UTC is needed add ,tz=timezone.utc)
+	log_date = datetime.datetime.fromtimestamp(log_date_le)#,tz=timezone.utc) #If UTC is needed add ,tz=timezone.utc)
 	return log_date
 
 

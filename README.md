@@ -14,3 +14,8 @@ A Python parser for recovering log records from the HIKVISION proprietary file s
 `python hikvision_loganalyzer.py`
 
 Or use the executable download from Releases section.
+
+
+# To Do List
+
+Update parser to parse log records starting at offset 41472

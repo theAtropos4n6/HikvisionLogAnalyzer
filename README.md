@@ -15,7 +15,3 @@ A Python parser for recovering log records from the HIKVISION proprietary file s
 
 Or use the executable download from Releases section.
 
-
-# To Do List
-
-Update parser to parse log records starting at offset 41472

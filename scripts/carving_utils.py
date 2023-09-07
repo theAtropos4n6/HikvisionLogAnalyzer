@@ -68,14 +68,32 @@ def carved_logfiles(input_file):
 			global offsets
 			global log_start_offset
 			global log_size
+			global alt_test
+			global alt_offset
+			global fs_info
 			log_start_offset = 0
 			log_size = 0
 			offsets = ['']
+			alt_offset = 41472
+			# alt_test = False
 			while True:
+				if offset == alt_offset: #checks if log start at offset 41472 regardless of where the fs header states
+					log_data = img_file.read(10*log_size) # read the whole block where the logs reside || the number 10 needs to be formalised since is a made up number. We need to identify exactly the size of logs in this case
+					log_data_to_str = binascii.hexlify(log_data).decode('utf-8') #convert to big string
+					if log_data_to_str.startswith("52415453"):
+						# alt_test = True
+						log_start_offset = offset
+						# hrf.mylogger(f"The start offset now is {log_start_offset}")
+						# hrf.mylogger(f"The log size now is {log_size}")
+						fs_info[0] = offset
+						# hrf.mylogger(len(log_data_to_str))
+						carved_info = parse_log_data(log_data_to_str,log_start_offset,"Alternative") #if mytest == True else parse_log_data(log_data_to_str,log_start_offset,"Alternative")# pass it on for parsing -> returned value is a dictionary where key is the no. of log entry and value is the extracted data
+						break#searching finishes as soon as the dict returns
+					img_file.seek(offset)
 				data = img_file.read(blocksize) # read image per blocksize
 				blk_to_str = binascii.hexlify(data).decode('utf-8')
 				if not data:
-					hrf.mylogger("Searched the whole image and no HikVision File System was found!")
+					hrf.mylogger("Searched the whole image and no HikVision File System was found!\n")
 					break #continues till the end of image
 				if fs_signature in blk_to_str: # if == HIKVISION@HANGZHOU
 					offsets = parse_fs_info(blk_to_str) #retrieves fs info, offset etc.
@@ -86,11 +104,12 @@ def carved_logfiles(input_file):
 				if log_size > 0 and offset == log_start_offset: #when reading iteration reach the offset where the logs begin
 					log_data = img_file.read(log_size) # read the whole block where the logs reside
 					log_data_to_str = binascii.hexlify(log_data).decode('utf-8') #convert to big string
-					carved_info = parse_log_data(log_data_to_str,log_start_offset) # pass it on for parsing -> returned value is a dictionary where key is the no. of log entry and value is the extracted data
+					carved_info = parse_log_data(log_data_to_str,log_start_offset) #if mytest == True else parse_log_data(log_data_to_str,log_start_offset,"Alternative")# pass it on for parsing -> returned value is a dictionary where key is the no. of log entry and value is the extracted data
 					break#searching finishes as soon as the dict returns
+				
 		return [carved_info,fs_info]
 	except Exception as e:
-		hrf.mylogger(f"Error occured while reading image file. The error message was {e}")
+		hrf.mylogger(f"Error occured while reading image file. The error message was {e}\n")
 
 
 
@@ -124,12 +143,15 @@ def parse_fs_info(blck):
 	# hrf.mylogger(f"The system initialisation time is: {init_time} UTC+00:00")
 	return [log_start_offset, size_of_system_logs_le,int(disk_size_in_mb),int(size_of_system_logs_in_b),str(init_time),str(fs_sig)]
 
-def parse_log_data(blck,current_offset):
+def parse_log_data(blck,current_offset,rtype="Generic"):
 	file_signature = "52415453" #magic bytes 'RATS' of logfiles.
 	logs_list = blck.split(file_signature)  #A list is created where each index is a logfile
-	hrf.mylogger(len(logs_list[0])/2)
-	entry_offset = current_offset+len(logs_list[0])/2#+len(file_signature)
-	hrf.mylogger(f'The are {len(logs_list)-1} log entries') #-1 because the 1st list item is not needed e.g. 0000000,52415453
+	# hrf.mylogger(len(logs_list[0])/2)
+	if rtype == "Generic":
+		entry_offset = current_offset+len(logs_list[0])/2#+len(file_signature)
+	elif rtype == "Alternative":
+		entry_offset = current_offset
+	hrf.mylogger(f'The are {len(logs_list)-1} log entries\n') #-1 because the 1st list item is not needed e.g. 0000000,52415453
 	counter = 1
 	log_results = {}
 	try:
@@ -146,7 +168,7 @@ def parse_log_data(blck,current_offset):
 				#hrf.mylogger(f'Log Date: {log_date} Major type: {major_type} Minor type: {minor_type} Details: {decription[0]} {decription[1]}')
 		return log_results
 	except Exception as e:
-		hrf.mylogger(f"Error occured while creating dict from carved image file (parse_log_data). The error message was {e}")
+		hrf.mylogger(f"Error occured while creating dict from carved image file (parse_log_data). The error message was {e}\n")
 
 #Major Type Mapping
 def get_MajorType(major_type):

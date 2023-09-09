@@ -52,7 +52,7 @@ def retrieve_carved_dict(carved_results):
 							"Parsing Status" : "",
 							"Entry Offset":""
 							}
-			output_dict[k]['Time'] = item[0][:-6]
+			output_dict[k]['Time'] = item[0]#[:-6] if you want to remove time zone offset
 			output_dict[k]['Major Type'] = item[1]
 			output_dict[k]['Minor Type'] = item[2]
 			output_dict[k]['Channel No.'] = item[3]

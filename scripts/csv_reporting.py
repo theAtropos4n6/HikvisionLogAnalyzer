@@ -48,7 +48,7 @@ def csv_report_for_carved_all(file,output_file_dir,carved_results):
 			writer.writerow(csv_header)
 			for k,v in carved_results.items():
 				item = v.split("#;#")
-				fieldnames = [k,item[0][:-6],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
+				fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
 				writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")
@@ -68,7 +68,7 @@ def csv_report_for_carved_supported(file,output_file_dir,carved_results):
 			for k,v in carved_results.items():
 				item = v.split("#;#")
 				if item[7] == "Parsed" or item[7] == "Partially Parsed":
-					fieldnames = [k,item[0][:-6],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
+					fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
 					writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")

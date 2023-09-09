@@ -14,7 +14,7 @@ import scripts.intel_methods as im
 cur_time = time.time()
 cur_time_in_ms = int(cur_time*1000)
 validation_status = []
-version = "1.0.2" #=> parser_last_update = "2023-07-09 05:00:00 UTC+00:00"
+version = "1.0.4" #=> parser_last_update = "2023-09-09"
 
 #######################################################################################################
 #                                """atropos icon BEGIN"""

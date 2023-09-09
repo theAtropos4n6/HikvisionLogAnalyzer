@@ -19,6 +19,7 @@ minor_type_dict = {
 	"5000":["Local: Login", "Parsed"], #Parsed #Parsed 
 	"5100":["Local: Logout", "Parsed"], #Parsed #Parsed 
 	"5200":["Local: Configure Parameters", "Log description is currently not parsed"],  #Skipped
+	"5c00":["Local: Initialize HDD", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"6e00":["HDD Detect", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"7000":["Remote: Login", "Parsed"], #Parsed #Parsed
 	"7100":["Remote: Logout", "Parsed"], #Parsed #Parsed
@@ -353,7 +354,16 @@ def get_Description(major_type,minor_type,description):
 		parsing_status = "Partially Parsed"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
-	
+
+	elif major_type == "Operation" and minor_type == "Local: Initialize HDD":
+		channel_no = ""
+		user_info = parse_User(description[:32])
+		ip_info = ""
+		details_info = ""
+		parsing_status = "Partially Parsed"
+		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
+		details_field.extend(multiple_values)
+
 	elif major_type == "Alarm" and minor_type in ["Start Motion Detection","Stop Motion Detection","Start Video Tampering","Stop Video Tampering"]:
 		camera = description[:2]
 		camera_hex = bytearray.fromhex(camera)

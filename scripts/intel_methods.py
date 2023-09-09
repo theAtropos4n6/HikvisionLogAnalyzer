@@ -17,7 +17,7 @@ def parse_hw_info(input_dict):
 		output_dict = {}
 		counter = 1
 		for k,v in input_dict.items():
-			if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD",]:
+			if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD","Local: Initialize HDD"]:
 				output_dict[counter] = v
 				counter += 1
 		return output_dict
@@ -29,7 +29,7 @@ def parse_antiforensics_info(input_dict):
 		output_dict = {}
 		counter = 1
 		for k,v in input_dict.items():
-			if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Remote: Export Config File"]:
+			if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Local: Initialize HDD","Remote: Export Config File"]:
 				output_dict[counter] = v
 				counter += 1
 		return output_dict
@@ -101,12 +101,12 @@ def carve_hw_info(input_dict,rtype="ALL"):
 		counter = 1
 		for k,v in input_dict.items():
 			if rtype == "ALL":
-				if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD"]:
+				if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD","Local: Initialize HDD"]:
 					output_dict[counter] = v
 					counter += 1
 			else:
 				if input_dict[k]["Parsing Status"] == "Parsed" or v["Parsing Status"] == "Partially Parsed":
-					if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD"]:
+					if input_dict[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD","Local: Initialize HDD"]:
 						output_dict[counter] = v
 						counter += 1
 		return output_dict
@@ -119,12 +119,12 @@ def carve_antiforensics_info(input_dict,rtype="ALL"):
 		counter = 1
 		for k,v in input_dict.items():
 			if rtype == "ALL":
-				if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Remote: Export Config File"]:
+				if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Local: Initialize HDD","Remote: Export Config File"]:
 					output_dict[counter] = v
 					counter += 1
 			else:
 				if input_dict[k]["Parsing Status"] == "Parsed" or v["Parsing Status"] == "Partially Parsed":
-					if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Remote: Export Config File"]:
+					if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Initialize HDD","Local: Initialize HDD","Remote: Export Config File"]:
 						output_dict[counter] = v
 						counter += 1
 		return output_dict

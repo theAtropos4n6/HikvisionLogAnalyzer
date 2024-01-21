@@ -182,7 +182,7 @@ def get_MajorType(major_type):
 	elif major_type == "0400":
 		mtype = "Information"
 	else:
-		mtype = "Unknown Major Type"
+		mtype = "Unknown Major Type"+f'{major_type}'
 	return mtype
 
 #Minor Type Mapping 
@@ -191,9 +191,9 @@ def get_MinorType(major_type,minor_type):
 		if minor_type in minor_type_dict[major_type].keys():
 			minor_type_code = minor_type_dict[major_type][minor_type][0]
 		else:
-			minor_type_code = "Unknown Minor Type"
+			minor_type_code = "Unknown Minor Type"+f'{minor_type}'
 	else:
-		minor_type_code = "Unknown Major Type"
+		minor_type_code = "Unknown Major Type"+f'{major_type}'
 	return minor_type_code
 
 
@@ -472,7 +472,7 @@ def get_Description(major_type,minor_type,description):
 def convert_date(hex_date): #date is stored in hex is stored in utc but when exporting logs they are exported in configured time zone
 	log_date_hex = bytearray.fromhex(hex_date)
 	log_date_le = int.from_bytes(log_date_hex,"little")
-	log_date = datetime.datetime.fromtimestamp(log_date_le)#,tz=timezone.utc) #If UTC is needed add ,tz=timezone.utc)
+	log_date = datetime.datetime.utcfromtimestamp(log_date_le)#,tz=timezone.utc) #If UTC is needed add ,tz=timezone.utc) 
 	return log_date
 
 

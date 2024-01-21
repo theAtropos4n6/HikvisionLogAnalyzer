@@ -111,7 +111,7 @@ def html_report_carved(img_filename,report_path,carved_results,splitn=2000,rtype
 	report_dir = f'{report_path}\\Reports_{cur_time}\\HTML\\Report_files'
 	if not os.path.exists(report_dir):
 		os.makedirs(report_dir)
-	time_zone = "Time (DVR-Selected Time Zone)"
+	time_zone = "Time (UTC)"
 	try:
 		counter = 0
 		key_holder = 0
@@ -224,7 +224,7 @@ def html_report_carved_fsinfo(img_filename,report_path,carved_results):
 			html_output += f'<td>{str(carved_results[-1])}</td>'
 			html_output += '</tr>'
 			html_output += '<tr>'
-			html_output += f'<td>Filesystem Initialization Time (DVR-Selected Time Zone):</td>'
+			html_output += f'<td>Filesystem Initialization Time (UTC):</td>'
 			html_output += f'<td>{str(carved_results[-2])}</td>'
 			html_output += '</tr>'			
 			html_output += '<tr>'

@@ -31,7 +31,7 @@ def html_report_parsed(dict_log,report_path,log_filename,time_zone_opt,rtype="Ge
 			html_output += f'\n<link rel="stylesheet" href="style.css">'
 			html_output += f'\n</head>'
 			html_output += f'<p> Logfile: {log_filename}</p>'
-			html_output += f'<p> There are currently {len(dict_log)} records within the log provided.</p>'
+			html_output += f'<p> {len(dict_log)} records were identified from the input provided.</p>'
 			html_output += '\n<table border = "1" width=100%>'
 			html_output += '\n<thead>'
 			html_output += f'\n<nav>'
@@ -98,7 +98,10 @@ def html_report_parsed(dict_log,report_path,log_filename,time_zone_opt,rtype="Ge
 
 def html_report_carved(img_filename,report_path,carved_results,splitn=2000,rtype="Generic"): 
 	prefix = rtype
-	dict_len = len(carved_results)
+	if carved_results is not None:
+		dict_len = len(carved_results)
+	else:
+		dict_len = 0
 	num_input = int(splitn)
 	split_input = num_input if not num_input == 2000 else 2000
 	if num_input == 0:
@@ -129,7 +132,7 @@ def html_report_carved(img_filename,report_path,carved_results,splitn=2000,rtype
 				html_output += f'\n<link rel="stylesheet" href="style.css">'
 				html_output += f'\n</head>'
 				html_output += f'<p> Image file: {img_filename}</p>'
-				heading = f'<p> There are currently {len(carved_results)} records within the image file provided.</p>' if rtype == "Generic" else f'<p> There are currently {len(carved_results)} records exported from the image file provided.</p>'
+				heading = f'<p> {len(carved_results)} records were identified from the input provided.</p>' if rtype == "Generic" else f'<p> There are currently {len(carved_results)} records exported from the image file provided.</p>'
 				html_output += heading
 				html_output += f'\n<nav>'
 				html_output += f'\n<a href="../index.html">Home Page</a>'

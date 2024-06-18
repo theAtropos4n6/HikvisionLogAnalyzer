@@ -48,7 +48,8 @@ def csv_report_for_carved_all(file,output_file_dir,carved_results):
 			writer.writerow(csv_header)
 			for k,v in carved_results.items():
 				item = v.split("#;#")
-				fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
+				sanitize_details = item[6].replace("," , "|") # details field has , values which cause errors in the CSV report so | symbol is used instead
+				fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],sanitize_details,item[7],item[8]] 
 				writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")
@@ -68,7 +69,8 @@ def csv_report_for_carved_supported(file,output_file_dir,carved_results):
 			for k,v in carved_results.items():
 				item = v.split("#;#")
 				if item[7] == "Parsed" or item[7] == "Partially Parsed":
-					fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8]] #item[0][:-6] -6 removes the slice "+00:00" from the datetime
+					sanitize_details = item[6].replace("," , "|") # details field has , values which cause errors in the CSV report so | symbol is used instead
+					fieldnames = [k,item[0],item[1],item[2],item[3],item[4],item[5],sanitize_details,item[7],item[8]] 
 					writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")
@@ -110,24 +112,19 @@ def csv_report_for_carved_intel_all(file,output_file_dir,carved_results,rtype="G
 			writer = csv.writer(csv_file,delimiter=';')
 			top_cell = "Image File: ;"+file+"\n"
 			csv_file.write(top_cell)
-			csv_header = ["Number of Record","Time (DVR-Selected Time Zone)","Major Type","Minor Type","Channel No.","Local/Remote User","Remote Host IP","Details","Parsing Status","Entry Offset"]
+			csv_header = ["Number of Record","Time (UTC)","Major Type","Minor Type","Channel No.","Local/Remote User","Remote Host IP","Details","Parsing Status","Entry Offset"]
 			writer.writerow(csv_header)
 			for k,v in carved_results.items():
-				# csv_detail_records = ""
-				# csv_detail_output = ""
-				# for i in v["Details"]:
-				# 	csv_detail_records += f'{i}, '
-				# details_data = csv_detail_records.rstrip(", ")
-				# csv_detail_output += details_data
+				sanitize_details = v["Details"].replace("," , "|") # details field has , values which cause errors in the CSV report so | symbol is used instead
 				if rtype == "Logon":
 					if carved_results[k]["Minor Type"] in ["Illegal Login","Remote: Login","Remote: Logout","Local: Login","Local: Logout"]:
-						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
+						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
 				elif rtype == "Hardware":
 					if carved_results[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD"]:
-						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
+						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
 				elif rtype == "Antiforensics":
 					if carved_results[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Alarm Disarming","Remote: Initialize HDD","Remote: Export Config File","Stop Record"]:
-						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
+						fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
 				writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")
@@ -148,25 +145,20 @@ def csv_report_for_carved_intel_supported(file,output_file_dir,carved_results,rt
 			writer = csv.writer(csv_file,delimiter=';')
 			top_cell = "Image File: ;"+file+"\n"
 			csv_file.write(top_cell)
-			csv_header = ["Number of Record","Time (DVR-Selected Time Zone)","Major Type","Minor Type","Channel No.","Local/Remote User","Remote Host IP","Details","Parsing Status","Entry Offset"]
+			csv_header = ["Number of Record","Time (UTC)","Major Type","Minor Type","Channel No.","Local/Remote User","Remote Host IP","Details","Parsing Status","Entry Offset"]
 			writer.writerow(csv_header)
 			for k,v in carved_results.items():
-				# csv_detail_records = ""
-				# csv_detail_output = ""
-				# for i in v["Details"]:
-				# 	csv_detail_records += f'{i}, '
-				# details_data = csv_detail_records.rstrip(", ")
-				# csv_detail_output += details_data
 				if carved_results[k]["Parsing Status"] == "Parsed" or carved_results[k]["Parsing Status"] == "Partially Parsed":
+					sanitize_details = v["Details"].replace("," , "|") # details field has , values which cause errors in the CSV report so | symbol is used instead
 					if rtype == "Logon":
 						if carved_results[k]["Minor Type"] in ["Illegal Login","Remote: Login","Remote: Logout","Local: Login","Local: Logout"]:
-							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
+							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
 					elif rtype == "Hardware":
 						if carved_results[k]["Minor Type"] in ["Power On","HDD Detect","HDD Information","HDD Error","Time Sync.","S.M.A.R.T. Information","Local: Shutdown","Local: Abnormal Shutdown","System Running State","Remote: Initialize HDD"]:
-							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
+							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
 					elif rtype == "Antiforensics":
-						if input_dict[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Alarm Disarming","Remote: Initialize HDD","Remote: Export Config File","Stop Record"]:
-							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],v["Details"],v["Parsing Status"],v["Entry Offset"]]
-				writer.writerow(fieldnames)
+						if carved_results[k]["Minor Type"] in ["Local: Configure Parameters","Remote: Configure Parameters","Remote: Alarm Disarming","Remote: Initialize HDD","Remote: Export Config File","Stop Record"]:
+							fieldnames = [k,v["Time"],v["Major Type"],v["Minor Type"],v["Channel No."],v["Local/Remote User"],v["Remote Host IP"],sanitize_details,v["Parsing Status"],v["Entry Offset"]]
+					writer.writerow(fieldnames)
 	except Exception as e:
 		hrf.mylogger(f"Error while creating csv report file. The error message was {e}")

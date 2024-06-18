@@ -10,7 +10,7 @@ import scripts.html_report_files as hrf
 
 #Supported_log_types
 global minor_type_dict,last_update
-last_update = "2023-01-30 08:00:00 UTC+00:00"
+last_update = "2024-06-18 10:00:00 UTC+00:00"
 minor_type_dict = {
 "Operation":{
 	"4100":["Power On", "Parsed"], #Parsed #Parsed
@@ -18,28 +18,28 @@ minor_type_dict = {
 	"4300":["Local: Abnormal Shutdown", "Parsed"], #Parsed #Parsed
 	"5000":["Local: Login", "Parsed"], #Parsed #Parsed 
 	"5100":["Local: Logout", "Parsed"], #Parsed #Parsed 
-	"5200":["Local: Configure Parameters", "Log description is currently not parsed"],  #Skipped
+	"5200":["Local: Configure Parameters", "Details field is currently not parsed"],  #Skipped
 	"5c00":["Local: Initialize HDD", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"6e00":["HDD Detect", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"7000":["Remote: Login", "Parsed"], #Parsed #Parsed
 	"7100":["Remote: Logout", "Parsed"], #Parsed #Parsed
 	"7600":["Remote: Get Parameters", "Parsed"],#Parsed #Parsed
-	"7700":["Remote: Configure Parameters","Log ‘Details’ field is currently not parsed"],  #Skipped
+	"7700":["Remote: Configure Parameters","Details field is currently not parsed"],  #Skipped
 	"7800":["Remote: Get Working Status", "Parsed"], #Parsed #Parsed
 	"7900":["Remote: Alarm Arming", "Parsed"], #Parsed #Parsed
 	"7a00":["Remote: Alarm Disarming", "Parsed"], #Parsed #Parsed
-	"8000":["Remote: Playback by Time","Log ‘Details’ field is currently not parsed"],  #Skipped
+	"8000":["Remote: Playback by Time","Details field is currently not parsed"],  #Skipped
 	"8200":["Remote: Initialize HDD","Partially Parsed"], #Partially Parsed #Partially Parsed
 	"8600":["Remote: Export Config File", "Parsed"] #Parsed #Parsed
 	},
 "Information":{
-	"a000":["Time Sync.","Log ‘Details’ field is currently not parsed"], #Skipped - More data reside in log entry than is extracted by Hikvision DVR
+	"a000":["Time Sync.","Details field is currently not parsed"], #Skipped - More data reside in log entry than is extracted by Hikvision DVR
 	"a100":["HDD Information", "Parsed"], #Parsed #Parsed
 	"a200":["S.M.A.R.T. Information", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"a300":["Start Record", "Partially Parsed"], ##Partially Parsed #Partially Parsed
 	"a400":["Stop Record", "Partially Parsed"], ##Partially Parsed #Partially Parsed
-	"aa00":["System Running State","Log ‘Details’ field is currently not parsed"],  #Skipped
-	"b800":["b800 - Unknown Minor Type","Log ‘Details’ field is currently not parsed"]  #Skipped
+	"aa00":["System Running State","Details field is currently not parsed"],  #Skipped
+	"b800":["b800 - Unknown Minor Type","Details field is currently not parsed"]  #Skipped
 	},
 "Alarm":{
 	"0300":["Start Motion Detection", "Parsed"], #Parsed #Parsed
@@ -49,9 +49,9 @@ minor_type_dict = {
 	},
 "Exception":{
 	"2200":["Illegal Login", "Parsed"], #Parsed #Parsed 
-	"2400":["HDD Error","Log ‘Details’ field is currently not parsed"],  #Skipped
-	"2700":["Network Disconnected","Log ‘Details’ field is currently not parsed"], #Skipped - Falsy parsed from Hikvision DVR itself. It sais Nic:LAN1 whereas the log entry stated eth0
-	"5400":["Hik-Connect Offline Exception","Log ‘Details’ field is currently not parsed"]   #Skipped
+	"2400":["HDD Error","Details field is currently not parsed"],  #Skipped
+	"2700":["Network Disconnected","Details field is currently not parsed"], #Skipped - Falsy parsed from Hikvision DVR itself. It sais Nic:LAN1 whereas the log entry stated eth0
+	"5400":["Hik-Connect Offline Exception","Details field is currently not parsed"]   #Skipped
 	}
 }
 #######################################################################################################
@@ -149,10 +149,10 @@ def parse_log_data(blck,current_offset,rtype="Generic"):
 	logs_list = blck.split(file_signature)  #A list is created where each index is a logfile
 	# hrf.mylogger(len(logs_list[0])/2)
 	if rtype == "Generic":
-		entry_offset = current_offset+len(logs_list[0])/2#+len(file_signature)
+		entry_offset = current_offset+len(logs_list[0])//2#+len(file_signature)
 	elif rtype == "Alternative":
 		entry_offset = current_offset
-	hrf.mylogger(f'The are {len(logs_list)-1} log entries\n') #-1 because the 1st list item is not needed e.g. 0000000,52415453
+	hrf.mylogger(f'There are {len(logs_list)-1} log entries\n') #-1 because the 1st list item is not needed e.g. 0000000,52415453
 	counter = 1
 	log_results = {}
 	try:
@@ -161,9 +161,13 @@ def parse_log_data(blck,current_offset,rtype="Generic"):
 				log_date = convert_date(log_entry[8:16]) #Parses log date. Standard offset
 				major_type = get_MajorType(log_entry[16:20]) #Parses major type. Standard offset
 				minor_type = get_MinorType(major_type,log_entry[20:24]) #Parses minor type. Standard offset
-				decription = get_Description(major_type,minor_type,log_entry[24:]) #Attempt to parse details field. Variable offset
-
-				log_results[counter] = str(log_date)+"#;#"+major_type+"#;#"+minor_type+"#;#"+str(decription[0])+"#;#"+decription[1]+"#;#"+decription[2]+"#;#"+decription[3]+"#;#"+decription[4]+"#;#"+str(int(entry_offset))
+				try:
+					decription = get_Description(major_type,minor_type,log_entry[24:]) #Attempt to parse details field. Variable offset
+					log_results[counter] = str(log_date)+"#;#"+major_type+"#;#"+minor_type+"#;#"+str(decription[0])+"#;#"+decription[1]+"#;#"+decription[2]+"#;#"+decription[3]+"#;#"+decription[4]+"#;#"+str(int(entry_offset))
+				except Exception as e:
+					hrf.mylogger(f"Error parsing log entry at {entry_offset} offset. The error is: {e}\n")
+					decription = f'Error occured while parsing this record'
+					log_results[counter] = str(log_date)+"#;#"+major_type+"#;#"+minor_type+"#;#"+""+"#;#"+""+"#;#"+""+"#;#"+decription+"#;#"+""+"#;#"+str(int(entry_offset))
 				entry_offset += int(len(file_signature)/2+len(log_entry)/2)
 				counter+=1
 				#hrf.mylogger(f'Log Date: {log_date} Major type: {major_type} Minor type: {minor_type} Details: {decription[0]} {decription[1]}')
@@ -187,13 +191,15 @@ def get_MajorType(major_type):
 
 #Minor Type Mapping 
 def get_MinorType(major_type,minor_type):
-	if major_type in minor_type_dict.keys():
-		if minor_type in minor_type_dict[major_type].keys():
+	#if major_type in minor_type_dict.keys():
+	if major_type in minor_type_dict:
+		#if minor_type in minor_type_dict[major_type].keys():
+		if minor_type in minor_type_dict[major_type]:
 			minor_type_code = minor_type_dict[major_type][minor_type][0]
 		else:
-			minor_type_code = "Unknown Minor Type"+f'{minor_type}'
+			minor_type_code = f"Unknown Minor Type: {minor_type}"
 	else:
-		minor_type_code = "Unknown Major Type"+f'{major_type}'
+		minor_type_code = f"Unknown Major Type: {major_type}"
 	return minor_type_code
 
 
@@ -260,7 +266,8 @@ def get_Description(major_type,minor_type,description):
 		firm_decode_str = codecs.decode(firm_in_bytes,"hex")
 		firm_str = str(firm_decode_str,'utf-8').replace("\x00","")	
 
-		details_info = "Serial = "+serial_str+", Model = "+model_str + ", Firmware = "+ firm_str
+		#details_info = "Serial = "+serial_str+", Model = "+model_str + ", Firmware = "+ firm_str
+		details_info = f"Serial = {serial_str}, Model = {model_str}, Firmware = {firm_str}"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
 
@@ -286,7 +293,8 @@ def get_Description(major_type,minor_type,description):
 		firm_decode_str = codecs.decode(firm_in_bytes,"hex")
 		firm_str = str(firm_decode_str,'utf-8').replace("\x00","")	
 
-		details_info = "HDD: "+hdd_str+", Serial: "+serial_str+", Firmware: "+ firm_str + ", Model: "+model_str
+		#details_info = "HDD: "+hdd_str+", Serial: "+serial_str+", Firmware: "+ firm_str + ", Model: "+model_str
+		details_info = f"HDD: {hdd_str}, Serial: {serial_str}, Firmware: {firm_str}, Model: {model_str}"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
 
@@ -319,12 +327,13 @@ def get_Description(major_type,minor_type,description):
 		sbuild_in_bytes = [bytearray.fromhex(description[-24:-22]),bytearray.fromhex(description[-22:-20]),bytearray.fromhex(description[-20:-18])]
 		sbuild__str = [int.from_bytes(sbuild_in_bytes[0],"little"),int.from_bytes(sbuild_in_bytes[1],"little"),int.from_bytes(sbuild_in_bytes[2],"little")]
 
-		details_info = "Model: "+model_str+", "+\
-					"Serial No.: "+serial_str+", "\
-					"Firmware: V"+ str(firm_str[0])+"."+str(firm_str[1])+"."+str(firm_str[2])+","+\
-					"Build: "+str(fbuild__str[2])+str(fbuild__str[1]).zfill(2)+str(fbuild__str[0])+\
-					", Encoding version: V"+str(encoding__str[1])+"."+str(encoding__str[0])+\
-					", Build: "+str(sbuild__str[2])+str(sbuild__str[1]).zfill(2)+str(sbuild__str[0])
+		# details_info = "Model: "+model_str+", "+\
+		# 			"Serial No.: "+serial_str+", "\
+		# 			"Firmware: V"+ str(firm_str[0])+"."+str(firm_str[1])+"."+str(firm_str[2])+","+\
+		# 			"Build: "+str(fbuild__str[2])+str(fbuild__str[1]).zfill(2)+str(fbuild__str[0])+\
+		# 			", Encoding version: V"+str(encoding__str[1])+"."+str(encoding__str[0])+\
+		# 			", Build: "+str(sbuild__str[2])+str(sbuild__str[1]).zfill(2)+str(sbuild__str[0])
+		details_info = f"Model: {model_str}, Serial No.: {serial_str}, Firmware: V{firm_str[0]}.{firm_str[1]}.{firm_str[2]}, Build: {str(fbuild__str[2])}{str(fbuild__str[1]).zfill(2)}{str(fbuild__str[0])}, Encoding version: V{str(encoding__str[1])}.{str(encoding__str[0])}, Build: {str(sbuild__str[2])}{str(sbuild__str[1]).zfill(2)}{str(sbuild__str[0])}"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
 	
@@ -454,8 +463,8 @@ def get_Description(major_type,minor_type,description):
 		else:
 			stream = ", Stream type: Unknown Stream"
 		channel_no = str(camera_le)
-		details_info = "Camera: "+ str(camera_le)+" "+status+" recording."+", Record enabled: "+record_enabled+", Event parameters: "+event_params+", Record type: "+record_type+", Stream type: Main Stream"+stream+", Motion detected on camera: "+str(motion_detection_le)
-		
+		#details_info = "Camera: "+ str(camera_le)+" "+status+" recording."+", Record enabled: "+record_enabled+", Event parameters: "+event_params+", Record type: "+record_type+", Stream type: Main Stream"+stream+", Motion detected on camera: "+str(motion_detection_le)
+		details_info = f"Camera: {str(camera_le)} {status} recording. Record enabled: {record_enabled}, Event parameters: {event_params}, Record type: {record_type}, Stream type: Main Stream{stream}, Motion detected on camera: {str(motion_detection_le)}"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
 	
@@ -464,7 +473,7 @@ def get_Description(major_type,minor_type,description):
 		user_info = ""
 		ip_info = ""
 		details_info = ""
-		parsing_status = "Log ‘Details’ field is currently not parsed"
+		parsing_status = "Details field is currently not parsed"
 		multiple_values = [channel_no,user_info,ip_info,details_info,parsing_status]
 		details_field.extend(multiple_values)
 	return details_field
